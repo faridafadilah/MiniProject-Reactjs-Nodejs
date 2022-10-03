@@ -15,8 +15,7 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Templating Engine
-app.set('view engine', 'ejs');
+app.use(express.static(__dirname + "/uploaded"));
 
 // database
 const db = require('./app/models');
@@ -37,9 +36,22 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
+// controller
+const mainController = require('./app/controllers/mainForum.controller.js');
+const subController = require('./app/controllers/subForum.controller.js');
+const threadController = require('./app/controllers/thread.controller.js');
+const postController = require('./app/controllers/post.controller.js');
+// const profilController = require('./app/controllers/profile');
+
 // route
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
+app.use('/api/main', mainController);
+app.use('/api/sub', subController);
+app.use('/api/thread', threadController);
+app.use('/api/post', postController);
+// app.use('/api/profile', profilController);
+
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

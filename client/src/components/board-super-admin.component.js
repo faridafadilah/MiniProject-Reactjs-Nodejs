@@ -41,6 +41,7 @@ export default class BoardSuperAdmin extends Component {
       <div className="container">
         <header className="jumbotron">
           <h3>{this.state.content}</h3>
+          <h6>Data Admin</h6>
         </header>
       </div>
     );

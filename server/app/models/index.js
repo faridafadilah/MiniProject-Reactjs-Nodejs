@@ -24,9 +24,14 @@ const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+
 // Initial Model
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
+db.main = require("./mainForum.model.js")(sequelize, Sequelize);
+db.sub = require("./subForum.model.js")(sequelize, Sequelize);
+db.thread = require("./thread.model.js")(sequelize, Sequelize);
+db.post = require("./post.model.js")(sequelize, Sequelize);
 
 // Relation Table
 db.role.belongsToMany(db.user, {
