@@ -41,16 +41,15 @@ const mainController = require('./app/controllers/mainForum.controller.js');
 const subController = require('./app/controllers/subForum.controller.js');
 const threadController = require('./app/controllers/thread.controller.js');
 const postController = require('./app/controllers/post.controller.js');
-// const profilController = require('./app/controllers/profile');
 
 // route
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
+require('./app/routes/superAdmin.routes')(app);
 app.use('/api/main', mainController);
 app.use('/api/sub', subController);
 app.use('/api/thread', threadController);
 app.use('/api/post', postController);
-// app.use('/api/profile', profilController);
 
 
 // set port, listen for requests

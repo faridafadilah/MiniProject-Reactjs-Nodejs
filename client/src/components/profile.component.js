@@ -12,7 +12,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Typography from '@mui/material/Typography';
 
 export default class Profile extends Component {
-  constructor(props) {
+  constructor(props) { 
     super(props);
 
     this.state = {

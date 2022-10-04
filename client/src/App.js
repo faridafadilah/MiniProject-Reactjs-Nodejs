@@ -19,6 +19,7 @@ import CreateSubForum from "./Pages/SubForum/CreateSubForum";
 import ShowSubForum from "./Pages/SubForum/ShowSubForum";
 import CreateThread from "./Pages/Thread/CreateThread";
 import ShowThread from "./Pages/Thread/ShowThread";
+import EditUser from "./Pages/SuperAdmin/EditUser";
 
 class App extends Component {
   constructor(props) {
@@ -57,6 +58,7 @@ class App extends Component {
             <Route path="/profile" element={<Profile />} />
             <Route path="/user" element={<BoardUser />} />
             <Route path="/super" element={<BoardSuperAdmin />} />
+            <Route path="/super/:id" element={<EditUser />} />
             <Route path="/admin" element={<BoardAdmin />} />
             <Route path='/main/create' element={showSuperAdminBoard? <CreateMainForum /> : <Navigate to='/login' />} />
             <Route path='/main/:id' element={<DetailMainForum />} />
