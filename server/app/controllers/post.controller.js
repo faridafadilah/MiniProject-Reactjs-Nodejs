@@ -1,16 +1,14 @@
-const express = require("express"); // Framework Express
-const router = express.Router(); // Router from Express
 const db = require("../models"); // Call Model
 const Post = db.post; // Call Model User
 
-// Route to Create Post
-router.post("/create", (req, res) => {
+// Controller For Create Post
+exports.create = (req, res) => {
   // Create a New Post
   const newPost = {
     content: req.body.content,
     threadId: req.body.threadId,
     userId: req.body.userId,
-    nameUser: req.body.nameUser
+    nameUser: req.body.nameUser,
   };
 
   // Save Post in the database
@@ -24,12 +22,13 @@ router.post("/create", (req, res) => {
           err.message || "Some error occurred while creating the sub forum.",
       });
     });
-});
+};
 
-// Route to All content Post
-router.get("/", async (req, res) => {
+// Controller For Find All Data Post
+exports.findAll = async (req, res) => {
   const page = req.query.page;
   const perPage = 10;
+  
   const posts = await Post.findAll({
     where: {
       threadId: req.query.threadId,
@@ -38,6 +37,29 @@ router.get("/", async (req, res) => {
     offset: perPage * (page - 1),
   });
   res.send(posts);
-});
+};
 
-module.exports = router;
+// Controller For Delete Post
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Post.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if(num == 1) {
+        res.send({
+          message: "Main Forum was deleted success!"
+        });
+      } else {
+        res.send({
+          message: 'Cannot delete with id' + id
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Main Forum with id" + id
+      });
+    });
+};

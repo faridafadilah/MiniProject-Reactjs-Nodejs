@@ -1,24 +1,19 @@
-const config = require('../config/db.config'); // Import Database
+const config = require("../config/db.config"); // Import Database
 
 // Configure Database
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize(
-  config.database,
-  config.user,
-  config.password,
-  {
-    host: config.host,
-    dialect: config.dialect,
-    operatorsAliases: false,
+const Sequelize = require("sequelize");
+const sequelize = new Sequelize(config.database, config.user, config.password, {
+  host: config.host,
+  dialect: config.dialect,
+  operatorsAliases: false,
 
-    pool: {
-      max: config.pool.max,
-      min: config.pool.min,
-      acquire: config.pool.acquire,
-      idle: config.pool.idle
-    }
-  }
-);
+  pool: {
+    max: config.pool.max,
+    min: config.pool.min,
+    acquire: config.pool.acquire,
+    idle: config.pool.idle,
+  },
+});
 
 const db = {};
 
@@ -37,12 +32,12 @@ db.post = require("./post.model.js")(sequelize, Sequelize);
 db.role.belongsToMany(db.user, {
   through: "user_roles",
   foreignKey: "roleId",
-  otherKey: "userId"
+  otherKey: "userId",
 });
 db.user.belongsToMany(db.role, {
   through: "user_roles",
   foreignKey: "userId",
-  otherKey: "roleId"
+  otherKey: "roleId",
 });
 
 db.ROLES = ["user", "admin", "super_admin"];

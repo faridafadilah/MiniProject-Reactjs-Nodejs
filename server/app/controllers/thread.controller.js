@@ -1,10 +1,8 @@
-const express = require("express"); // Framework Express
-const router = express.Router(); // Router from Express
 const db = require("../models"); // Call Model
 const Thread = db.thread; // Call Model User
 
-// Route Create Thread
-router.post("/create", (req, res) => {
+// Controller For Create Thread
+exports.create = (req, res) => {
   Thread.findOne({
     where: {
       title: req.body.title,
@@ -38,10 +36,10 @@ router.post("/create", (req, res) => {
         });
     }
   });
-});
+};
 
-// Route All Data Thread By Id Sub Forum
-router.get("/", (req, res) => {
+// Controller For Find All Thread
+exports.findAll = (req, res) => {
   Thread.findAll({
     where: {
       subforumId: req.query.subforumId,
@@ -61,10 +59,10 @@ router.get("/", (req, res) => {
         message: "Error retrieving Thread with id=" + id,
       });
     });
-});
+};
 
-// Route Thread By Id
-router.get("/:id", (req, res) => {
+// Controller For Find One Thread By ID
+exports.findOne = (req, res) => {
   const id = req.params.id;
 
   Thread.findByPk(id)
@@ -82,6 +80,29 @@ router.get("/:id", (req, res) => {
         message: "Error retrieving Thread with id=" + id,
       });
     });
-});
+};
 
-module.exports = router;
+// Controller For Delete Thread
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Thread.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if(num == 1) {
+        res.send({
+          message: "Main Forum was deleted success!"
+        });
+      } else {
+        res.send({
+          message: 'Cannot delete with id' + id
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Main Forum with id" + id
+      });
+    });
+};

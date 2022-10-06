@@ -1,13 +1,14 @@
 module.exports = (sequelize, Sequelize) => {
-    const Sub = sequelize.define("subforums", 
-    { 
-        judul: Sequelize.STRING,
-        mainforumId: Sequelize.INTEGER
+  const Sub = sequelize.define(
+    "subforums",
+    {
+      judul: Sequelize.STRING,
+      mainforumId: Sequelize.INTEGER,
     },
     {
-      timestamps: true 
+      timestamps: true,
     }
-    );
-  
-    return Sub;
+  );
+
+  return Sub;
 };

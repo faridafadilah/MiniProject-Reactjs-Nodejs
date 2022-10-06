@@ -9,22 +9,22 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 
-// parse requests of content-type - application/json
+// Parse requests of content-type - application/json
 app.use(bodyParser.json());
 
-// parse requests of content-type - application/x-www-form-urlencoded
+// Parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(__dirname + "/uploaded"));
+app.use('/uploads', express.static('uploads'));
 
-// database
+// Models Tabel
 const db = require('./app/models');
 const Role = db.role;
 
-// Jika ingin Membuat table ulang
+// Refresh Table
 // db.sequelize.sync();
 
-//force: true will drop the table if it already exists
+// Force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 //   console.log('Drop and Resync Db');
 //   initial();
@@ -41,24 +41,26 @@ const mainController = require('./app/controllers/mainForum.controller.js');
 const subController = require('./app/controllers/subForum.controller.js');
 const threadController = require('./app/controllers/thread.controller.js');
 const postController = require('./app/controllers/post.controller.js');
+const profile = require('./app/controllers/upload');
 
-// route
+// Route
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/superAdmin.routes')(app);
-app.use('/api/main', mainController);
-app.use('/api/sub', subController);
-app.use('/api/thread', threadController);
-app.use('/api/post', postController);
+require('./app/routes/mainForum.routes')(app);
+require('./app/routes/subForum.routes')(app);
+require('./app/routes/thread.routes')(app);
+require('./app/routes/post.routes')(app);
+// require('./app/routes/upload')(app);
 
 
-// set port, listen for requests
+// Set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 
-// Initial untuk Membuat Role [user, admin, super_admin]
+// Initial to Create Role [user, admin, super_admin]
 function initial() {
   Role.create({
     id: 1,

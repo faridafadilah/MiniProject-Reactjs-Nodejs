@@ -1,10 +1,8 @@
-const express = require("express"); // Framework Express
-const router = express.Router(); // Router from Express
 const db = require("../models"); // Call Model
 const subForum = db.sub; // Call Model User
 
-// Route To Create Sub Forum
-router.post("/create", (req, res) => {
+// Controller For Create Sub Forum
+exports.create = (req, res) => {
   subForum
     .findOne({
       where: {
@@ -39,10 +37,10 @@ router.post("/create", (req, res) => {
           });
       }
     });
-});
+};
 
-// Route To All Sub Forum
-router.get("/", (req, res) => {
+// Controller For Find All Data Sub Forum
+exports.findAll = (req, res) => {
   subForum
     .findAll({
       where: {
@@ -63,10 +61,10 @@ router.get("/", (req, res) => {
         message: "Error retrieving subForum with id=" + id,
       });
     });
-});
+};
 
-// Route Data By Id
-router.get("/:id", (req, res) => {
+// Controller For Find One By Id Sub Forum
+exports.findOne = (req, res) => {
   const id = req.params.id;
 
   subForum
@@ -85,6 +83,54 @@ router.get("/:id", (req, res) => {
         message: "Error retrieving subForum with id=" + id,
       });
     });
-});
+};
 
-module.exports = router;
+// Controller For Update Sub Forum
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  subForum.update(req.body, {
+    where: { id: id }
+  })
+    .then(num => {
+      if(num == 1) {
+        res.send({
+          message: "Sub Forum was updated success!"
+        });
+      } else {
+        res.send({
+          message: `Cannot update with id = ${id}`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating with id ="+id
+      });
+    });
+};
+
+// Controller For Delete Sub Forum
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  subForum.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if(num == 1) {
+        res.send({
+          message: "Sub Forum was deleted success!"
+        });
+      } else {
+        res.send({
+          message: 'Cannot delete with id' + id
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Sub Forum with id" + id
+      });
+    });
+};

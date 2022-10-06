@@ -9,7 +9,7 @@ var jwt = require("jsonwebtoken"); // JWT for Authentication
 var bcrypt = require("bcryptjs"); // Hash For Password
 
 // Controller For Register
-exports.signup = (req, res) => {
+exports.signup = (req, res) => { 
   // Save User to Database
   User.create({
     username: req.body.username,
