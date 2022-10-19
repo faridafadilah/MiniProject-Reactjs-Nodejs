@@ -1,8 +1,11 @@
-const db = require("../models"); // Call Model
-const mainForum = db.main; // Call Model User
+const db = require('../models') // Call Model
+const mainForum = db.main // Call Model User
+const fs = require('fs') // Module File System
+const path = require('path') // Module Path
 
 // Controller For Create Main Forum
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+  // Find One Data And Validation For Title ready use
   mainForum
     .findOne({
       where: {
@@ -12,105 +15,162 @@ exports.create = (req, res) => {
     .then((main) => {
       if (main) {
         res.status(400).send({
-          message: "Failed! Title is already in use!",
-        });
+          message: 'Failed! Title is already in use!',
+        })
       } else {
-        // Create a New Main
-        const newMain = {
-          title: req.body.title,
-        };
+        // Request Data
+        const title = req.body.title
+        const description = req.body.description
+        const file = req.files.file
+        const fileSize = file.data.length
+        const ext = path.extname(file.name)
+        const fileName = file.md5 + ext
+        const url = `${req.protocol}://${req.get('host')}/images/${fileName}`
+        const allowedType = ['.png', '.jpg', '.jpeg']
 
-        // Save mainForum in the database
-        mainForum
-          .create(newMain)
-          .then((data) => {
-            res.send(data);
-          })
-          .catch((err) => {
-            res.status(500).send({
-              message:
-                err.message ||
-                "Some error occurred while creating the main forum.",
-            });
-          });
+        if (!allowedType.includes(ext.toLowerCase())) {
+          return res.status(422).json({ msg: 'Invalid Images' })
+        }
+        if (fileSize > 10000000) {
+           return res.status(422).json({ msg: 'Image must be less than 10 MB' })
+        }
+        file.mv(`./public/images/${fileName}`, async (err) => {
+          if (err) res.status(500).json({ msg: err.message })
+          // Save mainForum in the database
+          mainForum
+            .create({
+              title: title,
+              description: description,
+              image: fileName,
+              url: url,
+            })
+            .then((data) => {
+              res.send(data)
+            })
+            .catch((err) => {
+              res.status(500).send({
+                message: err.message || 'Some error occurred while creating the main forum.',
+              })
+            })
+        })
       }
-    });
+    })
 }
 
 // Controller For Find All Data Main Forum
-exports.findAll = async(req, res) => {
-  const forum = await mainForum.findAll();
-  res.send(forum);
-};
+exports.findAll = async (req, res) => {
+  const forum = await mainForum.findAll()
+  res.send(forum)
+}
 
 // Controller For Find One By Id Main Forum
-exports.findOne = (req, res) => {
-  const id = req.params.id;
+exports.findOne = async (req, res) => {
+  const id = req.params.id
 
   mainForum
     .findByPk(id)
     .then((data) => {
       if (data) {
-        res.send(data);
+        res.send(data)
       } else {
         res.status(404).send({
           message: `Cannot find mainForum with id=${id}.`,
-        });
+        })
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error retrieving mainForum with id=" + id,
-      });
-    });
-};
+        message: 'Error retrieving mainForum with id=' + id,
+      })
+    })
+}
 
 // Controller For Update Main Forum
-exports.update = (req, res) => {
-  const id = req.params.id;
-
-  mainForum.update(req.body, {
-    where: { id: id }
+exports.update = async (req, res) => {
+  // Find One data By Id
+  const mains = await mainForum.findOne({
+    where: {
+      id: req.params.id,
+    },
   })
-    .then(num => {
-      if(num == 1) {
-        res.send({
-          message: "Sub Forum was updated success!"
-        });
-      } else {
-        res.send({
-          message: `Cannot update with id = ${id}`
-        });
-      }
+  // If Data Not Found
+  if (!mains) return res.status(404).json({ msg: 'No Data Found' })
+  
+  // File Image And URL
+  let fileName = ''
+  if (req.files === null) {
+    fileName = mains.image
+  } else {
+    const file = req.files.file
+    const fileSize = file.data.length
+    const ext = path.extname(file.name)
+    fileName = file.md5 + ext
+    const allowedType = ['.png', '.jpg', '.jpeg']
+
+    if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: 'Invalid Images' })
+    if (fileSize > 10000000) return res.status(422).json({ msg: 'Image must be less than 10 MB' })
+
+    if (mains.image) {
+      const filepath = `./public/images/${mains.image}`
+      fs.unlinkSync(filepath)
+    }
+
+    file.mv(`./public/images/${fileName}`, (err) => {
+      if (err) return res.status(500).json({ msg: err.message })
     })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating with id ="+id
-      });
-    });
-};
+  }
+
+  const title = req.body.title
+  const description = req.body.description
+  const url = `${req.protocol}://${req.get('host')}/images/${fileName}`
+
+  try {
+    await mainForum.update(
+      { title: title, description: description, image: fileName, url: url },
+      {
+        where: {
+          id: req.params.id,
+        },
+      }
+    )
+    res.status(200).json({ msg: 'mains Updated Successfuly' })
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
 // Controller For Delete Main Forum
-exports.delete = (req, res) => {
-  const id = req.params.id;
-
-  mainForum.destroy({
-    where: { id: id }
+exports.delete = async (req, res) => {
+  const id = req.params.id
+  const main = await mainForum.findOne({
+    where: {
+      id: req.params.id,
+    },
   })
-    .then(num => {
-      if(num == 1) {
+
+  if(main.image !== null) {
+    const filepath = `./public/images/${main.image}`
+    fs.unlinkSync(filepath)
+  }
+  // Delete By Id
+  mainForum
+    .destroy({
+      where: { id: id },
+    })
+    .then((num) => {
+      if (num == 1) {
         res.send({
-          message: "Main Forum was deleted success!"
-        });
+          message: 'Main Forum was deleted success!',
+        })
       } else {
         res.send({
-          message: 'Cannot delete with id' + id
-        });
+          message: 'Cannot delete with id' + id,
+        })
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Could not delete Main Forum with id" + id
-      });
-    });
-};
+        message: 'Could not delete Main Forum with id' + id,
+      })
+    })
+}

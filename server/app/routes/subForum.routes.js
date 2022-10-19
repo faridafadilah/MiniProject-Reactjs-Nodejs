@@ -1,5 +1,5 @@
 module.exports = (app) => {
-  const sub = require("../controllers/subForum.controller");
+  const sub = require("../controllers/subForum.controller"); // Call Controller
 
   var router = require("express").Router();
 
@@ -13,7 +13,7 @@ module.exports = (app) => {
   router.get("/:id", sub.findOne);
 
   // Update a Sub with id
-  router.put("/:id", sub.update);
+  router.patch("/:id", sub.update);
 
   // Delete a Sub with id
   router.delete("/:id", sub.delete);

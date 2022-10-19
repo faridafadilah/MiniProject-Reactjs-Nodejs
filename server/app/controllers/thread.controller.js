@@ -1,42 +1,50 @@
-const db = require("../models"); // Call Model
-const Thread = db.thread; // Call Model User
+const db = require('../models') // Call Model
+const Thread = db.thread // Call Model User
+const fs = require('fs') // Module File System
+const path = require('path') // Module Path
 
 // Controller For Create Thread
 exports.create = (req, res) => {
-  Thread.findOne({
-    where: {
-      title: req.body.title,
-      subforumId: req.body.subforumId,
-    },
-  }).then((sub) => {
-    if (sub) {
-      res.status(400).send({
-        message: "Failed! Name is already in use!",
-      });
-    } else {
-      // Create a new thread
-      const newsub = {
-        title: req.body.title,
-        subforumId: req.body.subforumId,
-        content: req.body.content,
-        userId: req.body.userId,
-      };
+  // Request Body
+  const title = req.body.title
+  const content = req.body.content
+  const subforumId = req.body.subforumId
+  const userId = req.body.userId
+  const userName = req.body.userName
+  const userImage = req.body.userImage
+  const file = req.files.file
+  const fileSize = file.data.length
+  const ext = path.extname(file.name)
+  const fileName = file.md5 + ext
+  const url = `${req.protocol}://${req.get('host')}/imageThread/${fileName}`
+  const allowedType = ['.png', '.jpg', '.jpeg']
 
-      // Save Thread in the database
-      Thread.create(newsub)
-        .then((data) => {
-          res.send(data);
+  if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: 'Invalid Images' })
+  if (fileSize > 5000000) return res.status(422).json({ msg: 'Image must be less than 5 MB' })
+  file.mv(`./public/imageThread/${fileName}`, async (err) => {
+    if (err) return res.status(500).json({ msg: err.message })
+    // Save Thread in the database
+    Thread.create({
+      title: title,
+      content: content,
+      subforumId: subforumId,
+      userId: userId,
+      userName: userName,
+      userImage: userImage,
+      image: fileName,
+      url: url,
+    })
+      .then((data) => {
+        res.send(data)
+      })
+      .catch((err) => {
+        res.status(500).send({
+          message: err.message || 'Some error occurred while creating the main forum.',
         })
-        .catch((err) => {
-          res.status(500).send({
-            message:
-              err.message ||
-              "Some error occurred while creating the sub forum.",
-          });
-        });
-    }
-  });
-};
+        return
+      })
+  })
+}
 
 // Controller For Find All Thread
 exports.findAll = (req, res) => {
@@ -47,62 +55,69 @@ exports.findAll = (req, res) => {
   })
     .then((data) => {
       if (data) {
-        res.send(data);
+        res.send(data)
       } else {
         res.status(404).send({
           message: `Cannot find Thread with id=${id}.`,
-        });
+        })
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error retrieving Thread with id=" + id,
-      });
-    });
-};
+        message: 'Error retrieving Thread with id=' + id,
+      })
+    })
+}
 
 // Controller For Find One Thread By ID
 exports.findOne = (req, res) => {
-  const id = req.params.id;
+  const id = req.params.id
 
   Thread.findByPk(id)
     .then((data) => {
       if (data) {
-        res.send(data);
+        res.send(data)
       } else {
         res.status(404).send({
           message: `Cannot find Thread with id=${id}.`,
-        });
+        })
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error retrieving Thread with id=" + id,
-      });
-    });
-};
+        message: 'Error retrieving Thread with id=' + id,
+      })
+    })
+}
 
 // Controller For Delete Thread
-exports.delete = (req, res) => {
-  const id = req.params.id;
+exports.delete = async (req, res) => {
+  const id = req.params.id
+  const thread = await Thread.findOne({
+    where: {
+      id: id,
+    },
+  })
+  const filepath = `./public/imageThread/${thread.image}`
+  fs.unlinkSync(filepath)
 
   Thread.destroy({
-    where: { id: id }
+    where: { id: id },
   })
-    .then(num => {
-      if(num == 1) {
+    .then((num) => {
+      if (num == 1) {
         res.send({
-          message: "Main Forum was deleted success!"
-        });
+          message: 'Main Forum was deleted success!',
+        })
       } else {
         res.send({
-          message: 'Cannot delete with id' + id
-        });
+          message: 'Cannot delete with id' + id,
+        })
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Could not delete Main Forum with id" + id
-      });
-    });
-};
+        message: 'Could not delete Main Forum with id' + id,
+      })
+    })
+}

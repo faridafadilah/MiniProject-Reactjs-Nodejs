@@ -27,6 +27,7 @@ db.main = require("./mainForum.model.js")(sequelize, Sequelize);
 db.sub = require("./subForum.model.js")(sequelize, Sequelize);
 db.thread = require("./thread.model.js")(sequelize, Sequelize);
 db.post = require("./post.model.js")(sequelize, Sequelize);
+db.user_role = require("./userRole.model.js")(sequelize, Sequelize);
 
 // Relation Table
 db.role.belongsToMany(db.user, {
@@ -34,6 +35,7 @@ db.role.belongsToMany(db.user, {
   foreignKey: "roleId",
   otherKey: "userId",
 });
+
 db.user.belongsToMany(db.role, {
   through: "user_roles",
   foreignKey: "userId",

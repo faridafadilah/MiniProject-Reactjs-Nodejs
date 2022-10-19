@@ -3,6 +3,9 @@ module.exports = (sequelize, Sequelize) => {
     "subforums",
     {
       judul: Sequelize.STRING,
+      description: Sequelize.TEXT,
+      image: Sequelize.STRING,
+      url: Sequelize.STRING,
       mainforumId: Sequelize.INTEGER,
     },
     {
@@ -12,3 +15,4 @@ module.exports = (sequelize, Sequelize) => {
 
   return Sub;
 };
+ 

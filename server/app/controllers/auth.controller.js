@@ -61,7 +61,7 @@ exports.signin = (req, res) => {
       if (!passwordIsValid) {
         return res.status(401).send({
           accessToken: null,
-          message: "Invalid Password!"
+          message: "Invalid Password and Username!"
         });
       }
 
@@ -87,37 +87,3 @@ exports.signin = (req, res) => {
       res.status(500).send({ message: err.message });
     });
 };
-
-// const { uploadFile }= require("../middleware/upload-file");
-
-// router.patch("/update",uploadFile("image"), async(req, res) => {
-//     try {
-//         const id = req.params.id;
-//         const newData = req.body
-
-//         await User.update(newData, {
-//             where: {
-//                 id
-//             }
-//         });
-
-//         const profile = JSON.parse(JSON.stringify(newData));
-//         const newdata = profile[0];
-//         res.send({
-//             status: "success",
-//             data: {
-//                 newdata,
-//                 image: "http://localhost:8080/uploads/" + newdata.image
-//             }
-//         });
-//     } catch(e) {
-//         console.log(e);
-//         res.send({
-//             status: 'failed',
-//             message: 'Server Error'
-//         })
-//     }
-// });
-
-
-// module.exports = router;

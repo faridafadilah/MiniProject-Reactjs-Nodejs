@@ -1,0 +1,14 @@
+export const API_USER = "http://localhost:8080/api/super/";
+export const API_EDIT_PROFILE = "http://localhost:8080/api/profile/";
+export const API_CREATE_MAIN = "http://localhost:8080/api/main/create";
+export const API_GET_MAIN = "http://localhost:8080/api/main/";
+export const API_MAIN = "http://localhost:8080/api/main";
+export const API_GET_SUB = "http://localhost:8080/api/sub?mainforumId=";
+export const API_SUB = "http://localhost:8080/api/sub/";
+export const API_SUB_CREATE = "http://localhost:8080/api/sub/create";
+export const API_GET_THREAD = "http://localhost:8080/api/thread?subforumId=";
+export const API_THREAD = "http://localhost:8080/api/thread/";
+export const API_CREATE_THREAD = "http://localhost:8080/api/thread/create";
+export const API_CREATE_POST = "http://localhost:8080/api/post/create";
+export const API_GET_POST = "http://localhost:8080/api/post?threadId="; 
+export const API_POST = "http://localhost:8080/api/post/";
